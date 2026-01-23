@@ -1,0 +1,16 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: BackendTLSPolicy
+metadata:
+  name: argocd-server-backend-tls
+  namespace: argocd
+spec:
+  targetRefs:
+    - group: ""
+      kind: Service
+      name: argocd-server
+  validation:
+    caCertificateRefs:
+      - group: ""
+        kind: ConfigMap
+        name: argocd-server-ca
+    hostname: argocd-server

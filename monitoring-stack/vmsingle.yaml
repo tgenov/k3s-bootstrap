@@ -1,0 +1,55 @@
+# vmsingle.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vmsingle
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vmsingle
+  template:
+    metadata:
+      labels:
+        app: vmsingle
+    spec:
+      containers:
+      - name: vmsingle
+        image: victoriametrics/victoria-metrics:v1.108.1
+        args:
+          - -storageDataPath=/data
+          - -retentionPeriod=1d
+          - -httpListenAddr=:8428
+          - -promscrape.config=/config/scrape.yaml
+        ports:
+        - containerPort: 8428
+          name: http
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            memory: 256Mi
+        volumeMounts:
+        - name: data
+          mountPath: /data
+        - name: config
+          mountPath: /config
+      volumes:
+      - name: data
+        emptyDir: {}
+      - name: config
+        configMap:
+          name: vmsingle-scrape-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vmsingle
+spec:
+  ports:
+  - port: 8428
+    targetPort: 8428
+    name: http
+  selector:
+    app: vmsingle

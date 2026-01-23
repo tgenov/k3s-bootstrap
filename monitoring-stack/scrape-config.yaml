@@ -1,0 +1,25 @@
+# scrape-config.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: vmsingle-scrape-config
+data:
+  scrape.yaml: |
+    scrape_configs:
+      - job_name: argocd-metrics
+        scrape_interval: 30s
+        static_configs:
+          - targets:
+            - argocd-metrics.argocd.svc:8082
+        
+      - job_name: argocd-server
+        scrape_interval: 30s
+        static_configs:
+          - targets:
+            - argocd-server-metrics.argocd.svc:8083
+        
+      - job_name: argocd-repo-server
+        scrape_interval: 30s
+        static_configs:
+          - targets:
+            - argocd-repo-server.argocd.svc:8084
