@@ -46,25 +46,16 @@ brew install colima docker docker-credential-helper kubectl jq mkcert argocd hel
 - Authenticates ArgoCD CLI
 - Opens `https://argocd.kube.local` in browser
 
-## Architecture
-
-```
-Browser → http://argocd.kube.local → 301 redirect
-Browser → https://argocd.kube.local
-        → Envoy Gateway (terminates TLS with mkcert wildcard)
-        → ArgoCD server (re-encrypts to self-signed)
-```
-
 ## Project structure
 
 ```
 start.sh                          # Bootstrap script
 argocd-bootstrap/
-  kustomization.yml               # ArgoCD + app-of-apps
-  app-of-apps.yaml                # Parent Application
+  kustomization.yml               # ArgoCD + apps
   applications/
-    envoy-gateway.yaml            # Wave 0: Envoy Gateway Helm chart
-    envoy-argocd-routes.yaml      # Wave 1: routing resources
+    envoy-gateway.yaml            
+    envoy-argocd-routes.yaml
+    monitoring-stack.yaml      
 envoy-routes/
   gateway.yaml                    # GatewayClass + Gateway + HTTP→HTTPS redirect
   argocd-routes.yaml              # HTTPRoutes for ArgoCD
