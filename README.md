@@ -38,11 +38,9 @@ brew install colima docker docker-credential-helper kubectl jq mkcert argocd hel
 - Extracts ArgoCD server CA for backend TLS re-encryption
 
 ### Phase 4: Applications (ArgoCD sync waves)
-
-| Wave | Application | What it deploys |
-|------|-------------|-----------------|
-| 0 | `envoy-gateway` | Envoy Gateway + Gateway API CRDs (Helm) |
-| 1 | `envoy-argocd-routes` | Gateway, HTTPRoutes, TLS policies |
+* `envoy-gateway` - Envoy Gateway + Gateway API CRDs (Helm) 
+*  `envoy-argocd-routes` - Gateway, HTTPRoutes, TLS policies
+*  `victoria-metrics` - Minimal Prometheus-compatible stack, HTTPRoutes
 
 ### Phase 5: Ready
 - Authenticates ArgoCD CLI
