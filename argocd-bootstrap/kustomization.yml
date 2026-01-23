@@ -38,5 +38,6 @@ patches:
 
 resources:
   - https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
-  - ./applications/envoy-gateway.yaml
   - ./applications/envoy-argocd-routes.yaml
+  - ./applications/envoy-gateway.yaml
+  - ./applications/monitoring-stack.yaml
