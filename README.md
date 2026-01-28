@@ -13,11 +13,11 @@ brew install colima docker docker-credential-helper kubectl jq mkcert argocd hel
 ```bash
 ./start.sh           # normal run
 ./start.sh --debug   # with trace output
-
+```
 ## Endpoints
+
 * ArgoCD: https://argocd.kube.local
 * VictoriaMetrics: https://metrics.kube.local
-```
 
 ## What it does
 
