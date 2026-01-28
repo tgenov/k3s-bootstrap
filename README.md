@@ -37,12 +37,13 @@ brew install colima docker docker-credential-helper kubectl jq mkcert argocd hel
 - Two-pass apply to bootstrap CRDs before Application resources
 - Extracts ArgoCD server CA for backend TLS re-encryption
 
-### Phase 4: Applications (ArgoCD sync waves)
+### Phase 4: Applications (ArgoCD managed)
 
-| Wave | Application | What it deploys |
-|------|-------------|-----------------|
-| 0 | `envoy-gateway` | Envoy Gateway + Gateway API CRDs (Helm) |
-| 1 | `envoy-argocd-routes` | Gateway, HTTPRoutes, TLS policies |
+| Application | What it deploys |
+|-------------|-----------------|
+| `envoy-gateway` | Envoy Gateway + Gateway API CRDs (Helm) |
+| `envoy-argocd-routes` | Gateway, HTTPRoutes, TLS policies |
+| `monitoring-stack` | VictoriaMetrics + ArgoCD metrics scraping |
 
 ### Phase 5: Ready
 - Authenticates ArgoCD CLI
@@ -51,10 +52,14 @@ brew install colima docker docker-credential-helper kubectl jq mkcert argocd hel
 ## Architecture
 
 ```
-Browser → http://argocd.kube.local → 301 redirect
+Browser → http://*.kube.local → 301 redirect
 Browser → https://argocd.kube.local
         → Envoy Gateway (terminates TLS with mkcert wildcard)
         → ArgoCD server (re-encrypts to self-signed)
+
+Browser → https://metrics.kube.local
+        → Envoy Gateway (terminates TLS)
+        → VictoriaMetrics (scrapes ArgoCD metrics)
 ```
 
 ## Project structure
@@ -62,14 +67,20 @@ Browser → https://argocd.kube.local
 ```
 start.sh                          # Bootstrap script
 argocd-bootstrap/
-  kustomization.yml               # ArgoCD + app-of-apps
-  app-of-apps.yaml                # Parent Application
+  kustomization.yml               # ArgoCD + applications
   applications/
-    envoy-gateway.yaml            # Wave 0: Envoy Gateway Helm chart
-    envoy-argocd-routes.yaml      # Wave 1: routing resources
+    envoy-gateway.yaml            # Envoy Gateway Helm chart
+    envoy-argocd-routes.yaml      # Routing resources
+    monitoring-stack.yaml         # VictoriaMetrics application
 envoy-routes/
   gateway.yaml                    # GatewayClass + Gateway + HTTP→HTTPS redirect
   argocd-routes.yaml              # HTTPRoutes for ArgoCD
   argocd-backend-tls.yaml         # ReferenceGrant + BackendTLSPolicy
+monitoring-stack/
+  kustomization.yaml              # Kustomize config
+  namespace.yaml                  # monitoring namespace
+  vmsingle.yaml                   # VictoriaMetrics deployment + service
+  scrape-config.yaml              # Prometheus scrape configs for ArgoCD
+  httproute.yaml                  # HTTPRoute for metrics.kube.local
 .ca/                              # mkcert CA (gitignored)
 ```
